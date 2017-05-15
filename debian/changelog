@@ -1,0 +1,5 @@
+libtgvoip (0.4.1~git20170514.73bf810-1) unstable; urgency=low
+
+  * Initial upload (Closes: #862582)
+
+ -- Nicholas Guriev <guriev-ns@ya.ru>  Sun, 14 May 2017 22:29:05 +0300

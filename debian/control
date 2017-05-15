@@ -1,0 +1,37 @@
+Source: libtgvoip
+Priority: optional
+Maintainer: Nicholas Guriev <guriev-ns@ya.ru>
+Build-Depends:
+ cmake (>=2.8.8),
+ debhelper (>=10),
+ gyp,
+ libasound2-dev,
+ libopus-dev,
+ libpulse-dev,
+ libssl-dev,
+Standards-Version: 3.9.8
+Section: libs
+Homepage: https://github.com/grishka/libtgvoip
+Vcs-Git: https://anonscm.debian.org/collab-maint/libtgvoip.git
+Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/libtgvoip.git
+
+Package: libtgvoip-dev
+Section: libdevel
+Architecture: any
+Depends: libtgvoip0.4.1 (= ${binary:Version}), ${misc:Depends}
+Description: VoIP library for Telegram clients - developer files
+ This package contains the multiplatform library for calls in Telegram.
+ Telegram is a free cloud-based instant messaging service, it was established
+ by Pavel Durov and his team in 2013.
+ .
+ This package provides headers files for development.
+
+Package: libtgvoip0.4.1
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: VoIP library for Telegram clients
+ This package contains the multiplatform library for calls in Telegram.
+ Telegram is a free cloud-based instant messaging service, it was established
+ by Pavel Durov and his team in 2013.
+ .
+ This package provides a shared library for clients.

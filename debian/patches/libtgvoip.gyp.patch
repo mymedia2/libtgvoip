@@ -1,0 +1,40 @@
+Description: Modification of build script
+ * Make library shared
+ * Append suffix with version
+ * Fix path to opus headers
+ * Remove hardcoded architecture
+Author: Nicholas Guriev <guriev-ns@ya.ru>
+Forwarded: no
+Last-Update: 2017-05-16
+
+--- a/libtgvoip.gyp
++++ b/libtgvoip.gyp
+@@ -4,7 +4,8 @@
+     'targets': [
+       {
+         'target_name': 'libtgvoip',
+-        'type': 'static_library',
++        'type': 'shared_library',
++        'product_extension': 'so.<!(echo -n $TGVOIP_SOVERSION)',
+         'dependencies': [],
+         'defines': [
+           'WEBRTC_APM_DEBUG_DUMP=0',
+@@ -13,7 +14,7 @@
+         'variables': {
+           'tgvoip_src_loc': '.',
+           'official_build_target%': '',
+-          'linux_path_opus_include%': '<(DEPTH)/../../../Libraries/opus/include',
++          'linux_path_opus_include%': '/usr/include/opus',
+         },
+         'include_dirs': [
+           '<(tgvoip_src_loc)/webrtc_dsp',
+@@ -372,9 +373,6 @@
+               'defines': [
+                 'WEBRTC_POSIX',
+               ],
+-              'cflags_cc': [
+-                '-msse2',
+-              ],
+               'direct_dependent_settings': {
+                 'libraries': [
+ 
