@@ -1,0 +1,17 @@
+Description: Fix deadlock after an incoming call
+Author: Nicholas Guriev <guriev-ns@ya.ru>
+Forwarded: yes
+Bug: https://github.com/telegramdesktop/tdesktop/issues/3408
+Last-Update: 2017-05-17
+
+--- a/VoIPController.cpp
++++ b/VoIPController.cpp
+@@ -194,8 +194,6 @@ VoIPController::~VoIPController(){
+ 	sendQueue->Put(NULL);
+ 	LOGD("before join sendThread");
+ 	join_thread(sendThread);
+-	LOGD("before join recvThread");
+-	join_thread(recvThread);
+ 	LOGD("before join tickThread");
+ 	join_thread(tickThread);
+ 	free_mutex(sendBufferMutex);

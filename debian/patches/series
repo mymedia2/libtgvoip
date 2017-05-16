@@ -1,1 +1,2 @@
 libtgvoip.gyp.patch
+Fix-deadlock-after-call.patch
