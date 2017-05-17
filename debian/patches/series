@@ -1,2 +1,2 @@
-libtgvoip.gyp.patch
+Modify-build-scripts.patch
 Fix-deadlock-after-call.patch

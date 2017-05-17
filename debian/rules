@@ -9,21 +9,26 @@ else
 endif
 
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
-export TGVOIP_SOVERSION = 0.4.1
+
+# specify SONAME version of libtgvoip
+export SOVER = 0.4.1
 
 %:
 	dh $@ --sourcedirectory=obj-$(DEB_HOST_GNU_TYPE)/$(BUILD_MODE)
 
 override_dh_auto_configure:
-	gyp --format=cmake --depth=. --generator-output=. -Gconfig=$(BUILD_MODE) -Goutput_dir=obj-$(DEB_HOST_GNU_TYPE) libtgvoip.gyp
+	gyp --format=cmake --depth=. --generator-output=. -Gconfig=$(BUILD_MODE) \
+		-Goutput_dir=obj-$(DEB_HOST_GNU_TYPE) libtgvoip.gyp
 	dh_auto_configure
 
 override_dh_auto_install:
-	mkdir -p debian/libtgvoip$(TGVOIP_SOVERSION)/usr/lib/$(DEB_HOST_MULTIARCH)
-	ln obj-*/lib.target/lib*.so.* debian/libtgvoip$(TGVOIP_SOVERSION)/usr/lib/$(DEB_HOST_MULTIARCH)
+	mkdir -p debian/libtgvoip$(SOVER)/usr/lib/$(DEB_HOST_MULTIARCH)
+	ln obj-*/lib.target/lib*.so.* \
+		debian/libtgvoip$(SOVER)/usr/lib/$(DEB_HOST_MULTIARCH)
 	mkdir -p debian/libtgvoip-dev/usr/lib/$(DEB_HOST_MULTIARCH)
-	ln -s libtgvoip.so.$(TGVOIP_SOVERSION) debian/libtgvoip-dev/usr/lib/$(DEB_HOST_MULTIARCH)/libtgvoip.so
-	dh_install
+	ln -s libtgvoip.so.$(SOVER) \
+		debian/libtgvoip-dev/usr/lib/$(DEB_HOST_MULTIARCH)/libtgvoip.so
+	dh_auto_install
 
 override_dh_auto_clean:
 	dh_auto_clean || dh_auto_clean --sourcedirectory=$(CURDIR)
@@ -31,5 +36,7 @@ override_dh_auto_clean:
 # Upstream does not provide a tarball
 get-orig-source:
 	git clone --depth=1 https://github.com/grishka/libtgvoip
-	tar --exclude-vcs -cJf ../libtgvoip_$(TGVOIP_SOVERSION)~git$$(cd libtgvoip && git log -1 --date="format:%Y%m%d" --format="%cd.%h").orig.tar.xz libtgvoip
+	tar --exclude-vcs -cJf ../libtgvoip_$(SOVER)~git$$(cd libtgvoip && \
+		git log -1 --date="format:%Y%m%d" --format="%cd.%h").orig.tar.xz \
+		libtgvoip
 	rm -rf libtgvoip

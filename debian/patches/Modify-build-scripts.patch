@@ -1,0 +1,72 @@
+Description: Modification of build script and list of architectures
+ * Make library shared
+ * Append suffix with version
+ * Fix path to opus headers
+ * Remove hardcoded architecture
+ * Turn off error on exotic architectures
+Author: Nicholas Guriev <guriev-ns@ya.ru>
+Forwarded: no
+Last-Update: 2017-05-16
+
+--- a/libtgvoip.gyp
++++ b/libtgvoip.gyp
+@@ -4,7 +4,8 @@
+     'targets': [
+       {
+         'target_name': 'libtgvoip',
+-        'type': 'static_library',
++        'type': 'shared_library',
++        'product_extension': 'so.<!(echo -n $SOVER)',
+         'dependencies': [],
+         'defines': [
+           'WEBRTC_APM_DEBUG_DUMP=0',
+@@ -13,7 +14,7 @@
+         'variables': {
+           'tgvoip_src_loc': '.',
+           'official_build_target%': '',
+-          'linux_path_opus_include%': '<(DEPTH)/../../../Libraries/opus/include',
++          'linux_path_opus_include%': '/usr/include/opus',
+         },
+         'include_dirs': [
+           '<(tgvoip_src_loc)/webrtc_dsp',
+@@ -372,9 +373,6 @@
+               'defines': [
+                 'WEBRTC_POSIX',
+               ],
+-              'cflags_cc': [
+-                '-msse2',
+-              ],
+               'direct_dependent_settings': {
+                 'libraries': [
+ 
+@@ -382,6 +380,13 @@
+               },
+             },
+           ],
++          [
++            '"<!(dpkg-architecture -q DEB_HOST_GNU_CPU)" == "i686"', {
++              'cflags_cc': [
++                '-msse2',
++              ],
++            }
++          ],
+         ],
+       },
+     ],
+--- a/webrtc_dsp/webrtc/typedefs.h
++++ b/webrtc_dsp/webrtc/typedefs.h
+@@ -48,11 +48,12 @@
+ #define WEBRTC_ARCH_32_BITS
+ #define WEBRTC_ARCH_LITTLE_ENDIAN
+ #else
+-#error Please add support for your architecture in typedefs.h
++#warning Please add support for your architecture in typedefs.h
+ #endif
+ 
+ #if !(defined(WEBRTC_ARCH_LITTLE_ENDIAN) ^ defined(WEBRTC_ARCH_BIG_ENDIAN))
+-#error Define either WEBRTC_ARCH_LITTLE_ENDIAN or WEBRTC_ARCH_BIG_ENDIAN
++#warning Attempt to compile with WEBRTC_ARCH_LITTLE_ENDIAN
++#define WEBRTC_ARCH_LITTLE_ENDIAN
+ #endif
+ 
+ // TODO(zhongwei.yao): WEBRTC_CPU_DETECTION is only used in one place; we should
