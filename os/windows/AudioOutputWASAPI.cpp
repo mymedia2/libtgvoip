@@ -268,9 +268,17 @@ void AudioOutputWASAPI::ActuallySetCurrentDevice(std::string deviceID){
 #else
 	Platform::String^ defaultDevID=Windows::Media::Devices::MediaDevice::GetDefaultAudioRenderId(Windows::Media::Devices::AudioDeviceRole::Communications);
 	HRESULT res1, res2;
-	audioClient=WindowsSandboxUtils::ActivateAudioDevice(defaultDevID->Data(), &res1, &res2);
+	IAudioClient2* audioClient2=WindowsSandboxUtils::ActivateAudioDevice(defaultDevID->Data(), &res1, &res2);
 	CHECK_RES(res1, "activate1");
 	CHECK_RES(res2, "activate2");
+
+	AudioClientProperties properties={};
+	properties.cbSize=sizeof AudioClientProperties;
+	properties.eCategory=AudioCategory_Communications;
+	res = audioClient2->SetClientProperties(&properties);
+	CHECK_RES(res, "audioClient2->SetClientProperties");
+
+	audioClient = audioClient2;
 #endif
 
 	res = audioClient->Initialize(AUDCLNT_SHAREMODE_SHARED, AUDCLNT_STREAMFLAGS_EVENTCALLBACK | AUDCLNT_STREAMFLAGS_NOPERSIST | 0x80000000/*AUDCLNT_STREAMFLAGS_AUTOCONVERTPCM*/, 60 * 10000, 0, &format, NULL);
@@ -281,6 +289,13 @@ void AudioOutputWASAPI::ActuallySetCurrentDevice(std::string deviceID){
 	CHECK_RES(res, "audioClient->GetBufferSize");
 
 	LOGV("buffer size: %u", bufSize);
+	REFERENCE_TIME latency;
+	if(SUCCEEDED(audioClient->GetStreamLatency(&latency))){
+		estimatedDelay=latency ? latency/10000 : 60;
+		LOGD("playback latency: %d", estimatedDelay);
+	}else{
+		estimatedDelay=60;
+	}
 
 	res = audioClient->SetEventHandle(audioSamplesReadyEvent);
 	CHECK_RES(res, "audioClient->SetEventHandle");
@@ -327,6 +342,7 @@ void AudioOutputWASAPI::RunThread() {
 	uint32_t framesWritten=0;
 
 	bool running=true;
+	//double prevCallback=VoIPController::GetCurrentTime();
 
 	while(running){
 		DWORD waitResult=WaitForMultipleObjectsEx(3, waitArray, false, INFINITE, false);
@@ -349,17 +365,21 @@ void AudioOutputWASAPI::RunThread() {
 			framesAvailable=bufferSize-padding;
 			res=renderClient->GetBuffer(framesAvailable, &data);
 			CHECK_RES(res, "renderClient->GetBuffer");
+
+			//double t=VoIPController::GetCurrentTime();
+			//LOGV("framesAvail: %u, time: %f, isPlaying: %d", framesAvailable, t-prevCallback, isPlaying);
+			//prevCallback=t;
 			
-			size_t bufferSize=framesAvailable*2;
-			while(bufferSize>remainingDataLen){
+			size_t bytesAvailable=framesAvailable*2;
+			while(bytesAvailable>remainingDataLen){
 				InvokeCallback(remainingData+remainingDataLen, 960*2);
 				remainingDataLen+=960*2;
 			}
-			memcpy(data, remainingData, bufferSize);
-			if(remainingDataLen>bufferSize){
-				memmove(remainingData, remainingData+bufferSize, remainingDataLen-bufferSize);
+			memcpy(data, remainingData, bytesAvailable);
+			if(remainingDataLen>bytesAvailable){
+				memmove(remainingData, remainingData+bytesAvailable, remainingDataLen-bytesAvailable);
 			}
-			remainingDataLen-=bufferSize;
+			remainingDataLen-=bytesAvailable;
 
 			res=renderClient->ReleaseBuffer(framesAvailable, 0);
 			CHECK_RES(res, "renderClient->ReleaseBuffer");

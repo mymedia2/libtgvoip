@@ -266,9 +266,17 @@ void AudioInputWASAPI::ActuallySetCurrentDevice(std::string deviceID){
 #else
 	Platform::String^ defaultDevID=Windows::Media::Devices::MediaDevice::GetDefaultAudioCaptureId(Windows::Media::Devices::AudioDeviceRole::Communications);
 	HRESULT res1, res2;
-	audioClient=WindowsSandboxUtils::ActivateAudioDevice(defaultDevID->Data(), &res1, &res2);
+	IAudioClient2* audioClient2=WindowsSandboxUtils::ActivateAudioDevice(defaultDevID->Data(), &res1, &res2);
 	CHECK_RES(res1, "activate1");
 	CHECK_RES(res2, "activate2");
+
+	AudioClientProperties properties={};
+	properties.cbSize=sizeof AudioClientProperties;
+	properties.eCategory=AudioCategory_Communications;
+	res = audioClient2->SetClientProperties(&properties);
+	CHECK_RES(res, "audioClient2->SetClientProperties");
+
+	audioClient=audioClient2;
 #endif
 
 	res = audioClient->Initialize(AUDCLNT_SHAREMODE_SHARED, AUDCLNT_STREAMFLAGS_EVENTCALLBACK | AUDCLNT_STREAMFLAGS_NOPERSIST | 0x80000000/*AUDCLNT_STREAMFLAGS_AUTOCONVERTPCM*/, 60 * 10000, 0, &format, NULL);
@@ -279,6 +287,13 @@ void AudioInputWASAPI::ActuallySetCurrentDevice(std::string deviceID){
 	CHECK_RES(res, "audioClient->GetBufferSize");
 
 	LOGV("buffer size: %u", bufSize);
+	REFERENCE_TIME latency;
+	if(SUCCEEDED(audioClient->GetStreamLatency(&latency))){
+		estimatedDelay=latency ? latency/10000 : 60;
+		LOGD("capture latency: %d", estimatedDelay);
+	}else{
+		estimatedDelay=60;
+	}
 
 	res = audioClient->SetEventHandle(audioSamplesReadyEvent);
 	CHECK_RES(res, "audioClient->SetEventHandle");
@@ -316,6 +331,7 @@ void AudioInputWASAPI::RunThread() {
 	uint32_t framesWritten=0;
 
 	bool running=true;
+	//double prevCallback=VoIPController::GetCurrentTime();
 
 	while(running){
 		DWORD waitResult=WaitForMultipleObjectsEx(3, waitArray, false, INFINITE, false);
@@ -336,13 +352,17 @@ void AudioInputWASAPI::RunThread() {
 				CHECK_RES(res, "audioClient->GetBufferSize");
 			}
 			BYTE* data;
-			uint32_t framesAvailable;
+			uint32_t framesAvailable=bufferSize;
 			DWORD flags;
 
 			res=captureClient->GetBuffer(&data, &framesAvailable, &flags, NULL, NULL);
 			CHECK_RES(res, "captureClient->GetBuffer");
 			size_t dataLen=framesAvailable*2;
 			assert(remainingDataLen+dataLen<sizeof(remainingData));
+
+			//double t=VoIPController::GetCurrentTime();
+			//LOGV("audio capture: %u, time %f", framesAvailable, t-prevCallback);
+			//prevCallback=t;
 
 			memcpy(remainingData+remainingDataLen, data, dataLen);
 			remainingDataLen+=dataLen;

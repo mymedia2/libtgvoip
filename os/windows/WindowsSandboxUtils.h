@@ -7,7 +7,9 @@
 
 #include <audioclient.h>
 #include <windows.h>
+#ifndef TGVOIP_WP_SILVERLIGHT
 #include <mmdeviceapi.h>
+#endif
 #include <wrl.h>
 #include <wrl/implements.h>
 
@@ -15,6 +17,7 @@ using namespace Microsoft::WRL;
 
 namespace tgvoip {
 
+#ifndef TGVOIP_WP_SILVERLIGHT
 	class ActivationHandler :
 		public RuntimeClass< RuntimeClassFlags< ClassicCom >, FtmBase, IActivateAudioInterfaceCompletionHandler >
 	{
@@ -23,12 +26,13 @@ namespace tgvoip {
 
 		ActivationHandler(HANDLE _event);
 		HANDLE event;
-		IAudioClient* client;
+		IAudioClient2* client;
 		HRESULT actResult;
 	};
+#endif
 
 	class WindowsSandboxUtils {
 	public:
-		static IAudioClient* ActivateAudioDevice(const wchar_t* devID, HRESULT* callResult, HRESULT* actResult);
+		static IAudioClient2* ActivateAudioDevice(const wchar_t* devID, HRESULT* callResult, HRESULT* actResult);
 	};
 }
