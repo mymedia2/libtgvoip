@@ -1,9 +1,6 @@
 /.debhelper/
 /debhelper-build-stamp
 /files
-/libtgvoip-dev.debhelper.log
-/libtgvoip-dev.substvars
-/libtgvoip-dev/
-/libtgvoip0.4.1.debhelper.log
-/libtgvoip0.4.1.substvars
-/libtgvoip0.4.1/
+/libtgvoip*.debhelper.log
+/libtgvoip*.substvars
+/libtgvoip*/
