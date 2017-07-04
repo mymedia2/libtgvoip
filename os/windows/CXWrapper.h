@@ -63,7 +63,7 @@ namespace libtgvoip{
 		virtual ~VoIPControllerWrapper();
 		void Start();
 		void Connect();
-		void SetPublicEndpoints(Windows::Foundation::Collections::IIterable<Endpoint^>^ endpoints, bool allowP2P);
+		void SetPublicEndpoints(const Platform::Array<Endpoint^>^ endpoints, bool allowP2P);
 		void SetNetworkType(NetworkType type);
 		void SetStateCallback(IStateCallback^ callback);
 		void SetMicMute(bool mute);
@@ -73,7 +73,9 @@ namespace libtgvoip{
 		Platform::String^ GetDebugLog();
 		Error GetLastError();
 		static Platform::String^ GetVersion();
+		int64 GetPreferredRelayID();
 		static void UpdateServerConfig(Platform::String^ json);
+		static void SwitchSpeaker(bool external);
 		//static Platform::String^ TestAesIge();
 	private:
 		static void OnStateChanged(tgvoip::VoIPController* c, int state);
@@ -82,11 +84,11 @@ namespace libtgvoip{
 		IStateCallback^ stateCallback;
     };
 
-
 	ref class MicrosoftCryptoImpl{
 	public:
 		static void AesIgeEncrypt(uint8_t* in, uint8_t* out, size_t len, uint8_t* key, uint8_t* iv);
 		static void AesIgeDecrypt(uint8_t* in, uint8_t* out, size_t len, uint8_t* key, uint8_t* iv);
+		static void AesCtrEncrypt(uint8_t* inout, size_t len, uint8_t* key, uint8_t* iv, uint8_t* ecount, uint32_t* num);
 		static void SHA1(uint8_t* msg, size_t len, uint8_t* out);
 		static void SHA256(uint8_t* msg, size_t len, uint8_t* out);
 		static void RandBytes(uint8_t* buffer, size_t len);
