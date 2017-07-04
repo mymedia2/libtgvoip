@@ -18,7 +18,7 @@ Vcs-Browser: https://anonscm.debian.org/git/collab-maint/libtgvoip.git
 Package: libtgvoip-dev
 Section: libdevel
 Architecture: any
-Depends: libtgvoip0.4.1 (= ${binary:Version}), ${misc:Depends}
+Depends: libtgvoip1.0 (= ${binary:Version}), ${misc:Depends}
 Description: VoIP library for Telegram clients - developer files
  This package contains the multiplatform library for calls in Telegram.
  Telegram is a free cloud-based instant messaging service, it was established
@@ -26,7 +26,7 @@ Description: VoIP library for Telegram clients - developer files
  .
  This package provides headers files for development.
 
-Package: libtgvoip0.4.2
+Package: libtgvoip1.0
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}
 Description: VoIP library for Telegram clients

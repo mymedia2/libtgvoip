@@ -11,7 +11,7 @@ endif
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 
 # specify SONAME version of libtgvoip
-export SOVER = 0.4.2
+export SOVER = 1.0
 
 # Workaround for hurd, see bugs.debian.org/799356
 ifeq ($(DEB_HOST_ARCH),hurd-i386)
