@@ -1,8 +1,9 @@
 libtgvoip (1.0~git20170704.445433f-1) unstable; urgency=medium
 
-  * Update to the latest commit
+  * Update to the latest commit; new soname
+  * Bump Standards-Version
 
- -- Nicholas Guriev <guriev-ns@ya.ru>  Tue, 04 Jul 2017 14:02:56 +0300
+ -- Nicholas Guriev <guriev-ns@ya.ru>  Tue, 04 Jul 2017 23:28:15 +0300
 
 libtgvoip (0.4.1~git20170517.2ed5a50-1) unstable; urgency=low
 
