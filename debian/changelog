@@ -2,6 +2,7 @@ libtgvoip (1.0~git20170704.445433f-1) unstable; urgency=medium
 
   * Update to the latest commit; new soname
   * Bump Standards-Version
+  * Add patch to fix FTBFS with OpenSSL 1.1
 
  -- Nicholas Guriev <guriev-ns@ya.ru>  Tue, 04 Jul 2017 23:28:15 +0300
 
