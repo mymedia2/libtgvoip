@@ -29,17 +29,16 @@ Last-Update: 2017-05-16
          },
          'include_dirs': [
            '<(tgvoip_src_loc)/webrtc_dsp',
-@@ -372,9 +373,6 @@
-               'defines': [
+@@ -373,7 +374,7 @@
                  'WEBRTC_POSIX',
                ],
--              'cflags_cc': [
+               'cflags_cc': [
 -                '-msse2',
--              ],
++                '-std=gnu++11',
+               ],
                'direct_dependent_settings': {
                  'libraries': [
- 
-@@ -382,6 +380,13 @@
+@@ -382,6 +383,13 @@
                },
              },
            ],
