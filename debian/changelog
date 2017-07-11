@@ -1,3 +1,10 @@
+libtgvoip (1.0~git20170704.445433f-1ppa1) xenial; urgency=medium
+
+  * Upload to Launchpad
+  * Add flag to compile as C++11
+
+ -- Nicholas Guriev <guriev-ns@ya.ru>  Tue, 11 Jul 2017 12:35:52 +0300
+
 libtgvoip (1.0~git20170704.445433f-1) unstable; urgency=medium
 
   * Update to the latest commit; new soname
