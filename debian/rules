@@ -19,7 +19,7 @@ ifeq ($(DEB_HOST_ARCH),hurd-i386)
 endif
 
 %:
-	dh $@ --sourcedirectory=obj-$(DEB_HOST_GNU_TYPE)/$(BUILD_MODE)
+	dh $@ --parallel --sourcedirectory=obj-$(DEB_HOST_GNU_TYPE)/$(BUILD_MODE)
 
 override_dh_auto_configure:
 	gyp --format=cmake --depth=. --generator-output=. -Gconfig=$(BUILD_MODE) \
